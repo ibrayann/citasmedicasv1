@@ -1,0 +1,145 @@
+{% extends 'base.html' %} {% block content %} {% load static %}
+<div class="container-fluid">
+  <div class="row my-auto vh-100">
+    <div class="col-md-8 col-sm-10 mx-auto my-auto">
+      <div class="card">
+        <div class="row">
+          <div class="col-md-6 col-sm-12">
+            <h1 class="fw-bold text-center mt-5">Bienvenido</h1>
+            <div class="align-items-center p-4">
+              <form
+                style="width: 100%"
+                action="{% url 'login' %}"
+                id="miFormulario"
+                method="POST"
+              >
+                {% csrf_token %}
+                <div class="form-outline mb-4">
+                  <input id="email" name="email" class="form-control" />
+                  <label class="form-label mt-2" for="email">Email</label>
+                  <div id="alertEmail" class="d-none text-danger"></div>
+                </div>
+
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  class="form-control"
+                />
+                <label class="form-label mt-2" for="password">Contraseña</label>
+                <div id="alertPassword" class="d-none text-danger"></div>
+
+                <div class="pt-1 mb-4">
+                  <input
+                    class="btn btn-dark"
+                    type="submit"
+                    value="Enviar"
+                    id="enviar"
+                  />
+                </div>
+
+                <p id="mensaje-error" class="d-none text-warning"></p>
+                <p class="small mb-5 pb-lg-2">
+                  <a class="text-muted" href="#!"
+                    >¿Has olvidado tu contraseña?</a
+                  >
+                </p>
+                <p>
+                  No tienes cuenta?
+                  <a class="link-info" href="{% url 'register' %}"
+                    >Registrate Aquí</a
+                  >
+                </p>
+              </form>
+            </div>
+            <div id="alertSuccess" class="d-none">Registro exitoso</div>
+            <div id="alertError" class="d-none alert alert-danger">
+              Error en el registro:
+            </div>
+          </div>
+          <div class="col-md-6 d-none d-sm-block">
+            <img
+              src="{% static 'app/galenosApp_auto_x2.jpg' %}"
+              alt="Login-image"
+              class="img-fluid h-100"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const formulario = document.getElementById("miFormulario");
+  const email = document.getElementById("email");
+  const userPassword = document.getElementById("password");
+  const alertSuccess = document.getElementById("alertSuccess");
+  const alertError = document.getElementById("alertError");
+  const errorMessage = document.getElementById("mensaje-error");
+  const alertEmail = document.getElementById("alertEmail");
+  const alertPassword = document.getElementById("alertPassword");
+
+  formulario.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    alertSuccess.classList.add("d-none");
+    alertError.classList.add("d-none");
+    errorMessage.classList.add("d-none");
+    alertEmail.classList.add("d-none");
+    alertPassword.classList.add("d-none");
+
+    // Validación de campos
+    let valid = true;
+
+    if (!email.value.trim()) {
+      alertEmail.classList.remove("d-none");
+      alertEmail.textContent = "El campo de correo electrónico es obligatorio.";
+      valid = false;
+    }
+
+    if (!userPassword.value.trim()) {
+      alertPassword.classList.remove("d-none");
+      alertPassword.textContent = "El campo de contraseña es obligatorio.";
+      valid = false;
+    }
+
+    if (valid) {
+      const data = new FormData(formulario);
+
+      try {
+        const response = await fetch("/login/", {
+          method: "POST",
+          body: data,
+        });
+
+        if (response.status === 200) {
+          try {
+            const responseJSON = await response.json();
+            localStorage.setItem("userData", JSON.stringify(responseJSON));
+            window.location.href = "/";
+          } catch (e) {
+            console.error("Error al cargar JSON: " + e);
+          }
+        } else if (response.status === 404) {
+          const responseData = await response.json();
+          alertError.classList.remove("d-none");
+          alertError.textContent = responseData.message;
+        } else if (response.status === 401) {
+          const responseData = await response.json();
+          alertError.classList.remove("d-none");
+          alertError.textContent = responseData.message;
+        } else {
+          const errorText = await response.text();
+          errorMessage.classList.remove("d-none");
+          errorMessage.textContent = errorText;
+        }
+      } catch (error) {
+        alertError.classList.remove("d-none");
+        alertError.textContent = "Error en la solicitud. Inténtalo de nuevo.";
+      }
+    }
+  });
+</script>
+
+{% endblock %}

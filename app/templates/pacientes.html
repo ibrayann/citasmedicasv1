@@ -1,0 +1,46 @@
+{% extends 'base.html' %} {% block content %}
+<div class="container-fluid px-5 bg-light my-5">
+  <div class="row">
+    <div class="col-sm-12 col-md-2">
+      <div class="card mb-2">
+        <ul class="list-group list-group-flush">
+          <a class="list-group-item">Pacientes</a>
+          <a class="list-group-item">Medicos</a>
+
+          <a class="list-group-item">Ver Citas</a>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col-sm-12 col-md-10">
+      <section class="card p-5">
+        <h4 class="card-title mb-4 fw-bold text-success">Pacientes</h4>
+        <!-- No necesitas el campo de búsqueda en este contexto -->
+
+        <div class="table-responsive" style="height: max-content">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Run</th>
+                <th scope="col">Nombre</th>
+                <th scope="col">Apellido</th>
+                <th scope="col">Email</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for paciente in pacientes_data %}
+              <tr>
+                <td>{{ paciente.run }}</td>
+                <td>{{ paciente.nombre }}</td>
+                <td>{{ paciente.apellido }}</td>
+                <td>{{ paciente.email }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+{% endblock %}

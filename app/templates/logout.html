@@ -1,0 +1,15 @@
+{% extends 'base.html' %} {% block content %} {% load static %}
+
+<script>
+  // Función para cerrar sesión y eliminar datos del localStorage
+  function logout() {
+    // Elimina la clave "userData" del localStorage
+    localStorage.removeItem("userData");
+
+    // Redirige a la página de inicio de sesión o a donde desees
+    window.location.href = "/login"; // Cambia la URL de redirección según tus necesidades
+  }
+  logout();
+</script>
+
+{% endblock %}

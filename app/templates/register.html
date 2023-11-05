@@ -1,0 +1,394 @@
+{% extends 'base.html' %} {% block content %} {% load static %}
+<div class="container-fluid">
+  <div class="row my-auto vh-100">
+    <div class="col-md-8 col-sm-10 mx-auto my-auto">
+      <div class="card">
+        <div class="row">
+          <div class="">
+            <a
+              href="{% url 'login' %}"
+              class="text-center btn btn-dark mt-3 mx-3"
+              >Ir al inicio</a
+            >
+            <h1 class="fw-bold text-center my-5">Regístrate</h1>
+            <div class="d-flex justify-content-center flex-column">
+              <form
+                method="POST"
+                action="{% url 'register' %}"
+                id="usuarioForm"
+                class="px-5"
+              >
+                {% csrf_token %}
+
+                <div class="row">
+                  <div class="col-md-6 col-sm-12">
+                    <label for="name" class="form-label">Nombre:</label>
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      class="form-control mb-3"
+                    />
+                    <div id="alertName" class="text-danger"></div>
+                  </div>
+
+                  <div class="col-md-6 col-sm-12">
+                    <label for="lastname" class="form-label">Apellido:</label>
+                    <input
+                      type="text"
+                      id="lastname"
+                      name="lastname"
+                      class="form-control mb-3"
+                    />
+                    <div id="alertLastname" class="text-danger"></div>
+                  </div>
+                </div>
+
+                <label for="rut" class="form-label">RUT:</label>
+                <input
+                  type="text"
+                  id="rut"
+                  name="rut"
+                  class="form-control mb-3"
+                />
+                <div id="alertRut" class="text-danger"></div>
+
+                <label for="phone" class="form-label">Teléfono:</label>
+                <input
+                  type="text"
+                  id="phone"
+                  name="phone"
+                  class="form-control mb-3"
+                />
+                <div id="alertPhone" class="text-danger"></div>
+
+                <label for="address" class="form-label">Dirección:</label>
+                <input
+                  type="text"
+                  id="address"
+                  name="address"
+                  class="form-control mb-3"
+                />
+                <div id="alertAddress" class="text-danger"></div>
+
+                <label for="email" class="form-label">Email:</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  class="form-control mb-3"
+                />
+                <div id="alertEmail" class="text-danger"></div>
+
+                <div class="row">
+                  <div class="col-md-6 col-sm-12">
+                    <label for="password" class="form-label">Password:</label>
+                    <input
+                      type="password"
+                      id="password"
+                      name="password"
+                      class="form-control"
+                      autocomplete="current-password"
+                    />
+
+                    <div id="alertPassword" class="text-danger"></div>
+                  </div>
+
+                  <div class="col-md-6 col-sm-12">
+                    <label for="confirm_password" class="form-label"
+                      >Confirmar Password:</label
+                    >
+                    <input
+                      type="password"
+                      id="confirm_password"
+                      name="confirm_password"
+                      class="form-control mb-3"
+                      autocomplete="current-password"
+                    />
+                    <div id="alertConfirmPassword" class="text-danger"></div>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  id="registroUsuarioButton"
+                  class="btn btn-dark mb-5"
+                  disabled
+                >
+                  Crear usuario
+                </button>
+              </form>
+
+              <div id="alertUsuarioSuccess" class="d-none alert alert-success">
+                Usuario registrado con éxito
+              </div>
+
+              <div id="alertError2" class="d-none alert alert-danger mx-3 mb-5">
+                Error en el registro:
+              </div>
+
+              <script>
+                const usuarioForm = document.getElementById("usuarioForm");
+                const name = document.getElementById("name");
+                const lastname = document.getElementById("lastname");
+                const rut = document.getElementById("rut");
+                const phone = document.getElementById("phone");
+                const address = document.getElementById("address");
+                const email = document.getElementById("email");
+                const password = document.getElementById("password");
+                const confirm_password =
+                  document.getElementById("confirm_password");
+                const registroUsuarioButton = document.getElementById(
+                  "registroUsuarioButton"
+                );
+
+                const alertName = document.getElementById("alertName");
+                const alertLastname = document.getElementById("alertLastname");
+                const alertRut = document.getElementById("alertRut");
+                const alertPhone = document.getElementById("alertPhone");
+                const alertAddress = document.getElementById("alertAddress");
+                const alertEmail = document.getElementById("alertEmail");
+                const alertPassword = document.getElementById("alertPassword");
+                const alertConfirmPassword = document.getElementById(
+                  "alertConfirmPassword"
+                );
+
+                const alertUsuarioSuccess = document.getElementById(
+                  "alertUsuarioSuccess"
+                );
+                const alertError = document.getElementById("alertError2");
+
+                const regUserName = /^[A-Za-zÑñÁáÉéÍíÓóÚúÜü\s]+$/;
+                const regUserEmail =
+                  /^[a-z0-9]+(\.[_a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,15})$/;
+
+                const pintarMensajeExito = () => {
+                  alertUsuarioSuccess.classList.remove("d-none");
+                  alertUsuarioSuccess.textContent = "Registrado con éxito";
+                };
+
+                const pintarMensajeError = (errores) => {
+                  errores.forEach((item) => {
+                    item.tipo.classList.remove("d-none");
+                    item.tipo.textContent = item.msg;
+                  });
+                };
+
+                confirm_password.addEventListener("input", () => {
+                  if (confirm_password.value === password.value) {
+                    registroUsuarioButton.disabled = false;
+                  } else {
+                    registroUsuarioButton.disabled = true;
+                  }
+                });
+
+                const validarYFormatearRut = (rut) => {
+                  // Eliminar guiones y puntos
+                  rut = rut.replace("-", "").replace(/\./g, "");
+
+                  // Validar que el RUT no contenga caracteres inválidos
+                  if (!rut.slice(0, -1).match(/^[0-9]+$/)) {
+                    return false;
+                  }
+
+                  // Obtener el dígito verificador
+                  const verificador = rut.slice(-1);
+                  rut = rut.slice(0, -1);
+
+                  // Verificar que el RUT tenga al menos un dígito antes del guión
+                  if (rut.length < 1) {
+                    return false;
+                  }
+
+                  // Calcular el dígito verificador esperado
+                  let suma = 0;
+                  let multiplicador = 2;
+
+                  for (let i = rut.length - 1; i >= 0; i--) {
+                    suma += parseInt(rut[i]) * multiplicador;
+                    multiplicador++;
+
+                    if (multiplicador === 8) {
+                      multiplicador = 2;
+                    }
+                  }
+
+                  let dvEsperado = 11 - (suma % 11);
+
+                  if (dvEsperado === 11) {
+                    dvEsperado = "0";
+                  } else if (dvEsperado === 10) {
+                    dvEsperado = "K";
+                  } else {
+                    dvEsperado = dvEsperado.toString();
+                  }
+
+                  // Verificar si el dígito verificador esperado coincide
+                  if (dvEsperado !== verificador.toUpperCase()) {
+                    return false;
+                  }
+
+                  // Formatear el RUT
+                  if (rut.length <= 2) {
+                    rut = `${rut}-${dvEsperado}`;
+                  } else if (rut.length <= 5) {
+                    rut = `${rut.slice(0, -3)}.${rut.slice(-3)}-${dvEsperado}`;
+                  } else {
+                    rut = `${rut.slice(0, -6)}.${rut.slice(-6, -3)}.${rut.slice(
+                      -3
+                    )}-${dvEsperado}`;
+                  }
+
+                  return true;
+                };
+
+                usuarioForm.addEventListener("submit", async (e) => {
+                  e.preventDefault();
+
+                  // Limpiar mensajes de error previos
+                  const errores = [];
+
+                  // Validaciones
+                  if (name.value.length < 3 || !regUserName.test(name.value)) {
+                    name.classList.add("is-invalid");
+                    errores.push({
+                      tipo: alertName,
+                      msg: "Formato no válido campo nombre, solo letras y mínimo 3 caracteres",
+                    });
+                  } else {
+                    name.classList.remove("is-invalid");
+                    name.classList.add("is-valid");
+                    alertName.textContent = "";
+                  }
+
+                  if (
+                    lastname.value.length < 3 ||
+                    !regUserName.test(lastname.value)
+                  ) {
+                    lastname.classList.add("is-invalid");
+                    errores.push({
+                      tipo: alertLastname,
+                      msg: "Formato no válido campo apellido, solo letras y mínimo 3 caracteres",
+                    });
+                  } else {
+                    lastname.classList.remove("is-invalid");
+                    lastname.classList.add("is-valid");
+                    alertLastname.textContent = "";
+                  }
+
+                  if (rut.value === "" || !validarYFormatearRut(rut.value)) {
+                    rut.classList.add("is-invalid");
+                    errores.push({
+                      tipo: alertRut,
+                      msg: "RUT no válido",
+                    });
+                  } else {
+                    rut.classList.remove("is-invalid");
+                    rut.classList.add("is-valid");
+                    alertRut.textContent = "";
+                  }
+
+                  if (phone.value === "" || !/^[0-9]+$/.test(phone.value)) {
+                    phone.classList.add("is-invalid");
+                    errores.push({
+                      tipo: alertPhone,
+                      msg: "Teléfono no válido, solo números",
+                    });
+                  } else {
+                    phone.classList.remove("is-invalid");
+                    phone.classList.add("is-valid");
+                    alertPhone.textContent = "";
+                  }
+
+                  if (address.value === "" || address.value.length < 5) {
+                    address.classList.add("is-invalid");
+                    errores.push({
+                      tipo: alertAddress,
+                      msg: "Dirección no válida, mínimo 5 caracteres",
+                    });
+                  } else {
+                    address.classList.remove("is-invalid");
+                    address.classList.add("is-valid");
+                    alertAddress.textContent = "";
+                  }
+
+                  if (email.value === "" || !regUserEmail.test(email.value)) {
+                    email.classList.add("is-invalid");
+                    errores.push({
+                      tipo: alertEmail,
+                      msg: "Email no válido",
+                    });
+                  } else {
+                    email.classList.remove("is-invalid");
+                    email.classList.add("is-valid");
+                    alertEmail.textContent = "";
+                  }
+
+                  if (password.value.length < 6) {
+                    password.classList.add("is-invalid");
+                    errores.push({
+                      tipo: alertPassword,
+                      msg: "Contraseña demasiado corta, mínimo 6 caracteres",
+                    });
+                  } else {
+                    password.classList.remove("is-invalid");
+                    password.classList.add("is-valid");
+                    alertPassword.textContent = "";
+                  }
+
+                  if (password.value !== confirm_password.value) {
+                    confirm_password.classList.add("is-invalid");
+                    errores.push({
+                      tipo: alertConfirmPassword,
+                      msg: "Las contraseñas no coinciden",
+                    });
+                  } else {
+                    confirm_password.classList.remove("is-invalid");
+                    confirm_password.classList.add("is-valid");
+                    alertConfirmPassword.textContent = "";
+                  }
+
+                  if (errores.length > 0) {
+                    pintarMensajeError(errores);
+                    return;
+                  }
+
+                  const data = new FormData(usuarioForm);
+
+                  try {
+                    const response = await fetch("/register/", {
+                      method: "POST",
+                      body: data,
+                    });
+
+                    if (response.status === 201) {
+                      try {
+                        const responseJSON = await response.json();
+                        window.location.href = "/login";
+                      } catch (e) {
+                        console.error("Error al cargar JSON: " + e);
+                      }
+                    } else if (response.status === 404) {
+                      const responseData = await response.json();
+                      alertError.classList.remove("d-none");
+                      alertError.textContent = responseData.message;
+                    } else {
+                      alertError.classList.remove("d-none");
+                      alertError.textContent =
+                        "Error en la solicitud. Inténtalo de nuevo.";
+                    }
+                  } catch (error) {
+                    alertUsuarioError.classList.remove("d-none");
+                    alertUsuarioError.textContent =
+                      "Error en la solicitud. Inténtalo de nuevo.";
+                  }
+                });
+              </script>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
