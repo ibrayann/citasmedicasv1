@@ -54,8 +54,9 @@
     <div class="col-sm-12 col-md-2">
       <div class="card mb-2">
         <ul class="list-group list-group-flush">
-          <a class="list-group-item">Pacientes</a>
-          <a class="list-group-item">Medicos</a>
+          <a class="list-group-item" href = "{% url 'pacientes'  %}">Pacientes</a>
+          <a class="list-group-item" href = "{% url 'medicos'  %}">Medicos</a>
+          <a class="list-group-item" href = "{% url 'pacientes'  %}">Registar Medico</a>
           <a class="list-group-item">Ver Citas</a>
         </ul>
       </div>
@@ -96,21 +97,27 @@
                 <th scope="col">Hora Inicio</th>
                 <th scope="col">Hora Fin</th>
                 <th scope="col">Run Médico</th>
+                <th scope="col">Acciones</th>
               </tr>
             </thead>
             <tbody>
               {% for agenda in agendamedica_data %}
               <tr>
-                <td>
+                <td {% if agenda.disponible == False %} class="text-danger" {% endif %}> 
                   {% if agenda.disponible == True %} Disponible {% else %}
                   Ocupada {% endif %}
                 </td>
-                <td>{{ agenda.fecha }}</td>
-                <td>{{ agenda.hora_inicio }}</td>
-                <td>{{ agenda.hora_fin }}</td>
-                <td>{{ agenda.run_medico }}</td>
-                <td>
-                  <form class="cambioEstadoForm">
+                <td {% if agenda.disponible == False %} class="text-danger" {% endif %}>{{ agenda.fecha }}</td>
+                <td {% if agenda.disponible == False %} class="text-danger" {% endif %}>{{ agenda.hora_inicio }}</td>
+                <td {% if agenda.disponible == False %} class="text-danger" {% endif %}>{{ agenda.hora_fin }}</td>
+                <td {% if agenda.disponible == False %} class="text-danger" {% endif %}>{{ agenda.run_medico }}</td>
+                <td {% if agenda.disponible == False %} class="text-danger" {% endif %}>
+                  <form
+                    style="width: 100%"
+                    id="cambioEstadoForm"
+                    method="POST"
+                    action="{% url 'cambioDisponibilidad'  %}"
+                  >
                     {% csrf_token %}
                     <input
                       type="hidden"
@@ -119,11 +126,16 @@
                     />
                     <input
                       type="hidden"
-                      name="nuevo_estado"
+                      name="disponible"
                       value="{% if agenda.disponible %}false{% else %}true{% endif %}"
                     />
-                    <button type="submit" class="btn btn-warning">
-                      Cambiar estado
+                    <input type="hidden" name="_method" value="patch" />
+                    <button
+                      type="submit"
+                      class="btn btn-warning"
+                      id="cambiarEstadoBtn"
+                    >
+                      Cambiar Disponibilidad
                     </button>
                   </form>
                 </td>
@@ -139,44 +151,7 @@
     </div>
   </div>
 </div>
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const cambioEstadoForms = document.querySelectorAll(".cambioEstadoForm");
 
-    cambioEstadoForms.forEach(function (cambioEstadoForm) {
-      cambioEstadoForm.addEventListener("submit", function (event) {
-        event.preventDefault();
-        const agendaId = this.querySelector("[name='agenda_id']").value;
-        const nuevoEstado = this.querySelector("[name='nuevo_estado']").value;
-        const endpoint = `https://controlcitasmedicas.brayan986788.repl.co/api/agendamedica/desbloquear-hora/${agendaId}`;
-        const csrfToken = document.querySelector(
-          "[name='csrfmiddlewaretoken']"
-        ).value;
-        fetch(endpoint, {
-          method: "PATCH",
-          cors
-          headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": csrfToken,
-          },
-          body: JSON.stringify({
-            disponible: nuevoEstado,
-          }),
-        })
-          .then((response) => {
-            if (response.status === 200) {
-              console.log("Solicitud PATCH exitosa.");
-            } else {
-              console.error("Error en la solicitud PATCH.");
-            }
-          })
-          .catch((error) => {
-            console.error("Error de red o en la solicitud PATCH:", error);
-          });
-      });
-    });
-  });
-</script>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const fechaFiltro = document.getElementById("fecha-filtro");

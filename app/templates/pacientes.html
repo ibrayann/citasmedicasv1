@@ -4,9 +4,11 @@
     <div class="col-sm-12 col-md-2">
       <div class="card mb-2">
         <ul class="list-group list-group-flush">
-          <a class="list-group-item">Pacientes</a>
-          <a class="list-group-item">Medicos</a>
-
+          <a class="list-group-item" href="{% url 'pacientes'  %}">Pacientes</a>
+          <a class="list-group-item" href="{% url 'medicos'  %}">Medicos</a>
+          <a class="list-group-item" href="{% url 'pacientes'  %}"
+            >Registar Medico</a
+          >
           <a class="list-group-item">Ver Citas</a>
         </ul>
       </div>

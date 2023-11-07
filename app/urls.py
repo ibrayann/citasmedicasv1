@@ -11,4 +11,7 @@ urlpatterns = [
   path('medicos/', views.medicos, name='medicos'),
   path('agendamedica/<str:run>/', views.agendamedica, name='agendamedica'),
   path('agregardia/<str:run>/', views.agregardia, name='agregardia'),
+  path('cambioDisponibilidad', views.cambioDisponibilidad, name='cambioDisponibilidad'),
+  path('registermedico/', views.registermedico, name='registermedico'),
+
 ]
