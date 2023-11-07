@@ -2,29 +2,33 @@
 <div class="container-fluid px-5 bg-light my-5">
   <div class="row">
     {% include 'base_menu.html' %}
-
     <div class="col-sm-12 col-md-10">
       <section class="card p-5">
-        <h4 class="card-title mb-4 fw-bold text-success">Pacientes</h4>
+        <h4 class="card-title mb-4 fw-bold text-success">Citas Medicas</h4>
         <!-- No necesitas el campo de búsqueda en este contexto -->
 
         <div class="table-responsive" style="height: max-content">
           <table class="table">
             <thead>
               <tr>
-                <th scope="col">Run</th>
-                <th scope="col">Nombre</th>
-                <th scope="col">Apellido</th>
-                <th scope="col">Email</th>
+                <th scope="col">Fecha</th>
+                <th scope="col">Run Paciente</th>
+                <th scope="col">Run Médico</th>
+                <th scope="col">Hora Inicio</th>
+
               </tr>
             </thead>
             <tbody>
-              {% for paciente in pacientes_data %}
+
+              {% for cita in citas_data %}
               <tr>
-                <td>{{ paciente.run }}</td>
-                <td>{{ paciente.nombre }}</td>
-                <td>{{ paciente.apellido }}</td>
-                <td>{{ paciente.email }}</td>
+                <td>{{ cita.fecha }}</td>
+                <td>{{ cita.Run_paciente }}</td>
+                <td>{{ cita.Run_medico }}</td>
+                <td>{{ cita.hora_inicio }}</td>
+                <td>
+                  <a href="{% url 'anular_cita' cita.ID_agenda %}" class="btn btn-danger">Anular hora</a>
+                </td>
               </tr>
               {% endfor %}
             </tbody>

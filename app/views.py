@@ -351,3 +351,46 @@ async def registermedico(request):
 
     # Si la solicitud es GET, muestra la plantilla 'login.html'
     return render(request, 'registermedico.html')
+
+async def citas_medicas(request):
+        # Realiza una solicitud GET a la URL externa 'https://controlcitasmedicas.brayan986788.repl.co/api/pacientes'
+    endpoint_url = 'https://controlcitasmedicas.brayan986788.repl.co/api/citasmedicas/'
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(endpoint_url) as response:
+                print(response.status)
+                if response.status == 200:
+                    try:
+                        response_json = await response.json()
+
+                        # Procesa los datos recibidos según sea necesario
+                        # Por ejemplo, podrías extraer datos específicos del JSON de respuesta
+
+                        # Obtener datos específicos del JSON de respuesta
+                        citas_data = response_json
+                        # Establecer esos datos en el contexto
+
+                        # Luego renderiza la plantilla pacientes.html con los datos
+                        return render(request, 'citas.html', {'citas_data': citas_data})
+
+
+                    except Exception as e:
+                        # Maneja errores al cargar JSON
+                        print(f"Error al cargar JSON: {e}")
+                        return HttpResponseServerError()
+                else:
+                    # Otro error inesperado en la solicitud
+                    return HttpResponseServerError()
+
+    except Exception as e:
+        # Maneja errores de solicitud
+        print(f"Error en la solicitud: {e}")
+        return HttpResponseServerError()
+
+def anular_cita(request):
+    return render(request, 'citas.html')
+
+
+def agendarhora(request):
+    return render(request, 'agendarhoras.html')
