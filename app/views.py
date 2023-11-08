@@ -427,5 +427,100 @@ async def anular_cita(request, ID_agenda):
     
 
 
-def agendarhora(request):
-    return render(request, 'agendarhoras.html')
+async def formulario_cita(request):
+    return  render(request,'formulario_cita.html')
+    
+
+async def agendarhora(request):
+    sucursal = request.GET.get('sucursal')
+    especialidad = request.GET.get('especialidad')
+    # Realiza una solicitud GET a la URL externa 'https://controlcitasmedicas.brayan986788.repl.co/api/pacientes'
+    endpoint_url = f'https://controlcitasmedicas.brayan986788.repl.co/api/medicos/medicos_sucursal_especialidad/{sucursal}/{especialidad}'
+    print(sucursal)
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(endpoint_url) as response:
+                print(response.status)
+                
+                if response.status == 200:
+                    try:
+                        response_json = await response.json()
+
+                        # Procesa los datos recibidos según sea necesario
+                        # Por ejemplo, podrías extraer datos específicos del JSON de respuesta
+
+                        # Obtener datos específicos del JSON de respuesta
+                        medicos_data = response_json
+                        print(medicos_data)
+                        # Establecer esos datos en el contexto
+
+                        # Luego renderiza la plantilla pacientes.html con los datos
+                        return render(request, 'agendahora.html', {'medicos_data': medicos_data})
+
+
+                    except Exception as e:
+                        # Maneja errores al cargar JSON
+                        print(f"Error al cargar JSON: {e}")
+                        return HttpResponseServerError()
+                else:
+                    # Otro error inesperado en la solicitud
+                    return HttpResponseServerError()
+
+    except Exception as e:
+        # Maneja errores de solicitud
+        print(f"Error en la solicitud: {e}")
+        return HttpResponseServerError()
+    
+
+async def seleccionar_hora(request):
+    run = request.GET.get('run')
+    # Realiza una solicitud GET a la URL externa 'https://controlcitasmedicas.brayan986788.repl.co/api/pacientes'
+    endpoint_url = f'https://controlcitasmedicas.brayan986788.repl.co/api/agendamedica/run-medico/{run}'
+    print(run)
+
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(endpoint_url) as response:
+                if response.status == 200:
+                    try:
+                        print("hola2")
+                        response_json = await response.json()
+
+                        # Procesa los datos recibidos según sea necesario
+                        # Por ejemplo, podrías extraer datos específicos del JSON de respuesta
+
+                        # Obtener datos específicos del JSON de respuesta
+                        agendamedica_data = response_json
+                        # Establecer esos datos en el contexto
+                        if len(response_json) > 0:
+                            # Procesa los datos recibidos según sea necesario
+                            # Por ejemplo, podrías extraer datos específicos del JSON de respuesta
+
+                            # Obtener datos específicos del JSON de respuesta
+                            agendamedica_data = response_json
+
+                            # Luego renderiza la plantilla agendamedica.html con los datos
+                            return render(request, 'seleccionar_hora.html', {'agendamedica_data': agendamedica_data, 'run': agendamedica_data[0]['run_medico']})
+                        else:
+                            print('no hay datos')
+                            print(run)
+                            return render(request, 'seleccionar_hora.html', { 'run': str(run)})
+                        
+                
+                    except Exception as e:
+                        # Maneja errores al cargar JSON
+                        print(f"Error al cargar JSON: {e}")
+                        return HttpResponseServerError()
+                else:
+                    # Otro error inesperado en la solicitud
+                    print("hola")
+                    return HttpResponseServerError()
+
+    except Exception as e:
+        # Maneja errores de solicitud
+        print(f"Error en la solicitud: {e}")
+        return HttpResponseServerError()
+
+    

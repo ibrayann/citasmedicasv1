@@ -1,0 +1,116 @@
+{% extends 'base.html' %} {% block content %} {% load static %}
+<div class="container-fluid">
+  <div class="row my-auto vh-100">
+    <div class="col-md-8 col-sm-10 mx-auto my-auto">
+      <div class="card">
+        <div class="row">
+          <div class="">
+            <a
+              href="{% url 'home' %}"
+              class="text-center btn btn-dark mt-3 mx-3"
+              >Ir al inicio</a
+            >
+            <h1 class="fw-bold text-center my-5">Agendar hora</h1>
+            <h2 class="fw-bold text-center my-5">1. Elegir sucursal y especialidad</h2>
+            <div class="d-flex justify-content-center flex-column">
+              <form
+                method="GET"
+                action="{% url 'agendarhora' %}"
+                id="agendarForm"
+                class="px-5"
+              >
+                {% csrf_token %}
+
+
+
+
+                    <div class="form-group">
+                        <label for="sucursal">Sucursal:</label>
+                        <select
+                          class="form-control mb-3"
+                          id="sucursal"
+                          name="sucursal"
+                        >
+                          <option value="1">Sucursal 1 - 123 Calle Principal</option>
+                          <option value="2">
+                            Sucursal 2 - 456 Avenida Secundaria
+                          </option>
+                          <option value="3">
+                            Sucursal 3 - 789 Carretera Principal
+                          </option>
+                        </select>
+                      </div>
+      
+                    <div class="form-group">
+                        <label for="especialidad">Especialidad:</label>
+                        <select
+                          class="form-control mb-3"
+                          id="especialidad"
+                          name="especialidad"
+                        >
+                          <option value="1">Pediatría</option>
+                          <option value="2">Cardiología</option>
+                          <option value="3">Dermatología</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" id="agendarButton" class="btn btn-dark mb-5">
+                       Siguiente
+                    </button>
+
+              </form>
+
+              <div id="alertUsuarioSuccess" class="d-none alert alert-success">
+                Hora agendada con exito
+              </div>
+
+              <div id="alertError2" class="d-none alert alert-danger mx-3 mb-5">
+                Error en agendar hora
+              </div>
+
+              <script>
+                const agendarForm = document.getElementById("agendarForm");
+                const agendarButton = document.getElementById("agendarButton");
+                const alertError = document.getElementById("alertError2");
+
+
+
+                agendarForm.addEventListener("submit", async (e) => {
+                  e.preventDefault();
+
+                    const data = new FormData(agendarForm);
+
+                    try {
+                    const response = await fetch(`/agendarhora/?${new URLSearchParams(data)}`, {
+                        method: "GET",
+                    });
+
+                    if (response.status === 200) {
+                        const urlParams = new URLSearchParams(data);
+                        const urlString = `/agendarhora/?${urlParams.toString()}`;
+                        window.location.href = urlString;
+                    } else if (response.status === 404) {
+                        const responseData = await response.json();
+                        alertError.classList.remove("d-none");
+                        alertError.textContent = responseData.message;
+                    } else {
+                        alertError.classList.remove("d-none");
+                        alertError.textContent =
+                        "Error en la solicitud. Inténtalo de nuevo.";
+                    }
+                    } catch (error) {
+                        console.log("hola4");
+                    }
+                });
+
+
+              </script>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
