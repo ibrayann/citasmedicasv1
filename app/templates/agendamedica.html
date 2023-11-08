@@ -1,156 +1,101 @@
 {% extends 'base.html' %} {% block content %}
-<div
-  class="modal fade"
-  id="exampleModal"
-  tabindex="-1"
-  aria-labelledby="exampleModalLabel"
-  aria-hidden="true"
->
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Seleccionar Fecha</h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        ></button>
-      </div>
-      <form method="POST" action="{% url 'agregardia' run %}">
-        {% csrf_token %}
-        <!-- Agregar la etiqueta de apertura del formulario -->
-        <div class="modal-body">
-          <!-- Input de fecha -->
-          <div class="form-group">
-            <label for="fecha">Fecha:</label>
-            <input
-              type="date"
-              class="form-control"
-              id="fecha"
-              name="fecha"
-              min="{{ fecha_actual }}"
-              max="{{ fecha_maxima }}"
-            />
-          </div>
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Seleccionar Fecha</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="agregardiaForm" method="POST" action="{% url 'agregardia' run %}">
+              {% csrf_token %}
+
+              <div class="modal-body">
+                  <div class="form-group">
+                      <label for="fecha">Fecha:</label>
+                      <input type="date" class="form-control" id="fecha" name="fecha" min="{{ fecha_actual }}" max="{{ fecha_maxima }}" />
+                  </div>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                  <button type="submit" class="btn btn-primary">Guardar</button>
+              </div>
+          </form>
         </div>
-        <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-secondary"
-            data-bs-dismiss="modal"
-          >
-            Cerrar
-          </button>
-          <button type="submit" class="btn btn-primary">Guardar</button>
-        </div>
-      </form>
     </div>
-  </div>
 </div>
 
 <div class="container-fluid px-5 bg-light my-5">
-  <div class="row">
-    <div class="col-sm-12 col-md-2">
-      <div class="card mb-2">
-        <ul class="list-group list-group-flush">
-          <a class="list-group-item" href = "{% url 'pacientes'  %}">Pacientes</a>
-          <a class="list-group-item" href = "{% url 'medicos'  %}">Medicos</a>
-          <a class="list-group-item" href = "{% url 'pacientes'  %}">Registar Medico</a>
-          <a class="list-group-item">Ver Citas</a>
-        </ul>
-      </div>
-    </div>
-
-    <div class="col-sm-12 col-md-10">
-      <section class="card p-5">
-        <h4 class="card-title mb-4 fw-bold text-success">Agenda Medica</h4>
-        <button
-          type="button"
-          class="btn btn-success mb-4"
-          data-bs-toggle="modal"
-          data-bs-target="#exampleModal"
-        >
-          Agregar Agenda
-        </button>
-        <div class="row mb-5">
-          <div class="col-md-4">
-            <div class="input-group">
-              <input type="date" id="fecha-filtro" class="form-control" />
+    <div class="row">
+        <div class="col-sm-12 col-md-2">
+            <div class="card mb-2">
+                <ul class="list-group list-group-flush">
+                    <a class="list-group-item" href="{% url 'pacientes' %}">Pacientes</a>
+                    <a class="list-group-item" href="{% url 'medicos' %}">Medicos</a>
+                    <a class="list-group-item" href="{% url 'pacientes' %}">Registar Medico</a>
+                    <a class="list-group-item">Ver Citas</a>
+                </ul>
             </div>
-          </div>
-          <div class="col-md-4">
-            <button id="filtrar-agendas" class="btn btn-primary">
-              Filtrar
-            </button>
-          </div>
         </div>
 
-        <!-- No necesitas el campo de búsqueda en este contexto -->
-        <div class="table-responsive" style="height: max-content">
-          {% if agendamedica_data %}
-          <table class="table">
-            <thead>
-              <tr>
-                <th scope="col">Disponible</th>
-                <th scope="col">Fecha</th>
-                <th scope="col">Hora Inicio</th>
-                <th scope="col">Hora Fin</th>
-                <th scope="col">Run Médico</th>
-                <th scope="col">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for agenda in agendamedica_data %}
-              <tr>
-                <td {% if agenda.disponible == False %} class="text-danger" {% endif %}> 
-                  {% if agenda.disponible == True %} Disponible {% else %}
-                  Ocupada {% endif %}
-                </td>
-                <td {% if agenda.disponible == False %} class="text-danger" {% endif %}>{{ agenda.fecha }}</td>
-                <td {% if agenda.disponible == False %} class="text-danger" {% endif %}>{{ agenda.hora_inicio }}</td>
-                <td {% if agenda.disponible == False %} class="text-danger" {% endif %}>{{ agenda.hora_fin }}</td>
-                <td {% if agenda.disponible == False %} class="text-danger" {% endif %}>{{ agenda.run_medico }}</td>
-                <td {% if agenda.disponible == False %} class="text-danger" {% endif %}>
-                  <form
-                    style="width: 100%"
-                    id="cambioEstadoForm"
-                    method="POST"
-                    action="{% url 'cambioDisponibilidad'  %}"
-                  >
-                    {% csrf_token %}
-                    <input
-                      type="hidden"
-                      name="agenda_id"
-                      value="{{ agenda.ID_agenda }}"
-                    />
-                    <input
-                      type="hidden"
-                      name="disponible"
-                      value="{% if agenda.disponible %}false{% else %}true{% endif %}"
-                    />
-                    <input type="hidden" name="_method" value="patch" />
-                    <button
-                      type="submit"
-                      class="btn btn-warning"
-                      id="cambiarEstadoBtn"
-                    >
-                      Cambiar Disponibilidad
-                    </button>
-                  </form>
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-          {% else %}
-          <p>No hay datos de agenda médica disponibles.</p>
-          {% endif %}
+        <div class="col-sm-12 col-md-10">
+            <section class="card p-5">
+                <h4 class="card-title mb-4 fw-bold text-success">Agenda Medica</h4>
+                    <button type="button" class="btn btn-success mb-4" data-bs-toggle="modal" data-bs-target="#exampleModal">Agregar Agenda</button>
+                {% if agendamedica_data %}
+                    <div class="row mb-5">
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <input type="date" id="fecha-filtro" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <button id="filtrar-agendas" class="btn btn-primary">Filtrar</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive" style="height: max-content">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Disponible</th>
+                                    <th scope="col">Fecha</th>
+                                    <th scope="col">Hora Inicio</th>
+                                    <th scope="col">Hora Fin</th>
+                                    <th scope="col">Run Médico</th>
+                                    <th scope="col">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for agenda in agendamedica_data %}
+                                    <tr>
+                                        <td {% if agenda.disponible == False %} class="text-danger" {% endif %}>
+                                            {% if agenda.disponible == True %} Disponible {% else %} Ocupada {% endif %}
+                                        </td>
+                                        <td {% if agenda.disponible == False %} class="text-danger" {% endif %}>{{ agenda.fecha }}</td>
+                                        <td {% if agenda.disponible == False %} class="text-danger" {% endif %}>{{ agenda.hora_inicio }}</td>
+                                        <td {% if agenda.disponible == False %} class="text-danger" {% endif %}>{{ agenda.hora_fin }}</td>
+                                        <td {% if agenda.disponible == False %} class="text-danger" {% endif %}>{{ agenda.run_medico }}</td>
+                                        <td {% if agenda.disponible == False %} class="text-danger" {% endif %}>
+                                            <form style="width: 100%" id="cambioEstadoForm" method="POST" action="{% url 'cambioDisponibilidad' %}">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="agenda_id" value="{{ agenda.ID_agenda }}" />
+                                                <input type="hidden" name="disponible" value="{% if agenda.disponible %}false{% else %}true{% endif %}" />
+                                                <input type="hidden" name="_method" value="patch" />
+                                                <button type="submit" class="btn btn-warning" id="cambiarEstadoBtn">Cambiar Disponibilidad</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p>No hay datos de agenda médica disponibles.</p>
+                {% endif %}
+            </section>
         </div>
-      </section>
     </div>
-  </div>
 </div>
+
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
@@ -172,6 +117,30 @@
     });
   });
 </script>
+<script>
+   document.addEventListener('DOMContentLoaded', function () {
+    // Captura el valor de 'run' de la URL actual
+    const url = window.location.href;
+    const match = url.match(/\/agendamedica\/([^/]+)/);
+    const runValue = match ? match[1] : null; // Verifica si se capturó 'run' de la URL
+
+    // Establece el valor capturado en el campo oculto del formulario
+    const runInput = document.getElementById('runInput');
+    if (runInput && runValue) {
+        runInput.value = runValue;
+    }
+});
+
+// Muestra el modal y envía el formulario
+$('#exampleModal').on('shown.bs.modal', function () {
+    const form = document.getElementById('agregardiaForm');
+    if (form) {
+        form.submit();
+    }
+});
+
+</script>
+
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const feriadosData = [

@@ -207,18 +207,28 @@ async def agendamedica(request, run):
                         # Obtener datos específicos del JSON de respuesta
                         agendamedica_data = response_json
                         # Establecer esos datos en el contexto
+                        if len(response_json) > 0:
+                            # Procesa los datos recibidos según sea necesario
+                            # Por ejemplo, podrías extraer datos específicos del JSON de respuesta
 
-                        # Luego renderiza la plantilla pacientes.html con los datos
-                        return render(request, 'agendamedica.html', {'agendamedica_data': agendamedica_data, 'run': agendamedica_data[0]['run_medico']})
+                            # Obtener datos específicos del JSON de respuesta
+                            agendamedica_data = response_json
 
-
+                            # Luego renderiza la plantilla agendamedica.html con los datos
+                            return render(request, 'agendamedica.html', {'agendamedica_data': agendamedica_data, 'run': agendamedica_data[0]['run_medico']})
+                        else:
+                            print('no hay datos')
+                            print(run)
+                            return render(request, 'agendamedica.html', { 'run': str(run)})
+                        
+                
                     except Exception as e:
                         # Maneja errores al cargar JSON
                         print(f"Error al cargar JSON: {e}")
                         return HttpResponseServerError()
                 else:
                     # Otro error inesperado en la solicitud
-                    return HttpResponseServerError()
+                    return []
 
     except Exception as e:
         # Maneja errores de solicitud
@@ -228,33 +238,35 @@ async def agendamedica(request, run):
 # En tu archivo views.py
 
 async def agregardia(request, run):
-    if request.method == 'POST':
-        fecha = request.POST.get('fecha')
+    if run:
+        if request.method == 'POST':
+            fecha = request.POST.get('fecha')
+            data = {'fecha': fecha, 'run_medico': run}
+            headers = {'Content-Type': 'application/json'}
+            json_data = json.dumps(data)
 
-        data = {'fecha': fecha, 'run_medico': run}
-        headers = {'Content-Type': 'application/json'}
-        json_data = json.dumps(data)
-
-        endpoint_url = 'https://controlcitasmedicas.brayan986788.repl.co/api/agendamedica/agregar-dia'
-        print('data',data)
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.post(endpoint_url, data=json_data, headers=headers) as response:
-                    if response.status == 200:
-                        try:
-                            response_json = await response.json()
-                            return JsonResponse(response_json, status=200)
-                        except Exception as e:
-                            print(f"Error al cargar JSON: {e}")
-                            return HttpResponseServerError()
-                    elif response.status == 404:
-                        return JsonResponse({'message': 'Usuario no registrado'}, status=404)
-                    else:
-                        return JsonResponse({'error': f'Error {response.status} en la solicitud a {endpoint_url}'}, status=500)
-        except Exception as e:
-            # Maneja errores de solicitud
-            print(f"Error en la solicitud: {e}")
-            return HttpResponseServerError()
+            endpoint_url = 'https://controlcitasmedicas.brayan986788.repl.co/api/agendamedica/agregar-dia'
+            print('data',data)
+            try:
+                async with aiohttp.ClientSession() as session:
+                    async with session.post(endpoint_url, data=json_data, headers=headers) as response:
+                        if response.status == 200:
+                            try:
+                                response_json = await response.json()
+                                return JsonResponse(response_json, status=200)
+                            except Exception as e:
+                                print(f"Error al cargar JSON: {e}")
+                                return HttpResponseServerError()
+                        elif response.status == 404:
+                            return JsonResponse({'message': 'Usuario no registrado'}, status=404)
+                        else:
+                            return JsonResponse({'error': f'Error {response.status} en la solicitud a {endpoint_url}'}, status=500)
+            except Exception as e:
+                # Maneja errores de solicitud
+                print(f"Error en la solicitud: {e}")
+                return HttpResponseServerError()
+    else:
+        return HttpResponseNotFound()
 
 async def cambioDisponibilidad(request):
 
