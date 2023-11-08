@@ -29,31 +29,26 @@ async def login(request):
                         try:
                             response_json = await response.json()
                             
-                            # Realiza acciones adicionales con response_json si es necesario
-                            
-                            # Guarda el contenido en el localStorage
-                            # Esta parte se debe realizar en JavaScript en el cliente
-                            # Aquí solo puedes indicar qué hacer en la respuesta exitosa
                             return JsonResponse(response_json, status=200)
                         except Exception as e:
-                            # Maneja errores al cargar JSON
+   
                             print(f"Error al cargar JSON: {e}")
                             return HttpResponseServerError()
                     elif response.status == 404:
-                        # Usuario no registrado en el sistema externo
+ 
                         return JsonResponse({'message': 'Usuario no registrado'}, status=404)
                     elif response.status == 401:
-                        # Credenciales inválidas en el sistema externo
+
                         return JsonResponse({'message': 'Credenciales inválidas'}, status=401)
                     else:
-                        # Otro error inesperado en la solicitud
+  
                         return JsonResponse({'error': f'Error {response.status} en la solicitud a {endpoint_url}'}, status=500)
         except Exception as e:
-            # Maneja errores de solicitud
+
             print(f"Error en la solicitud: {e}")
             return HttpResponseServerError()
 
-    # Si la solicitud es GET, muestra la plantilla 'login.html'
+
     return render(request, 'login.html')
 
 
@@ -88,33 +83,22 @@ async def register(request):
                         try:
                             response_json = await response.json()
                             
-                            # Realiza acciones adicionales con response_json si es necesario
-                            
-                            # Guarda el contenido en el localStorage
-                            # Esta parte se debe realizar en JavaScript en el cliente
-                            # Aquí solo puedes indicar qué hacer en la respuesta exitosa
                             return JsonResponse(response_json, status=201)
                         except Exception as e:
-                            # Maneja errores al cargar JSON
                             print(f"Error al cargar JSON: {e}")
                             return HttpResponseServerError()
                     elif response.status == 500:
-                        # Usuario no registrado en el sistema externo
                         return JsonResponse({'message': 'Usuario no registrado, verifique email o rut no esten asociados a una cuenta'}, status=404)
                     else:
-                        # Otro error inesperado en la solicitud
                         return JsonResponse({'error': f'Error {response.status} en la solicitud a {endpoint_url}'}, status=500)
                     
         except Exception as e:
-            # Maneja errores de solicitud
             print(f"Error en la solicitud: {e}")
             return HttpResponseServerError()
 
-    # Si la solicitud es GET, muestra la plantilla 'login.html'
     return render(request, 'register.html')
 
 async def pacientes(request):
-    # Realiza una solicitud GET a la URL externa 'https://controlcitasmedicas.brayan986788.repl.co/api/pacientes'
     endpoint_url = 'https://controlcitasmedicas.brayan986788.repl.co/api/pacientes'
 
     try:
@@ -126,27 +110,19 @@ async def pacientes(request):
                         response_json = await response.json()
                         print(response_json)
 
-                        # Procesa los datos recibidos según sea necesario
-                        # Por ejemplo, podrías extraer datos específicos del JSON de respuesta
-
-                        # Obtener datos específicos del JSON de respuesta
                         pacientes_data = response_json
-                        # Establecer esos datos en el contexto
 
-                        # Luego renderiza la plantilla pacientes.html con los datos
                         return render(request, 'pacientes.html', {'pacientes_data': pacientes_data})
 
 
                     except Exception as e:
-                        # Maneja errores al cargar JSON
                         print(f"Error al cargar JSON: {e}")
                         return HttpResponseServerError()
                 else:
-                    # Otro error inesperado en la solicitud
                     return HttpResponseServerError()
 
     except Exception as e:
-        # Maneja errores de solicitud
+
         print(f"Error en la solicitud: {e}")
         return HttpResponseServerError()
 
@@ -158,7 +134,6 @@ def logout(request):
     return render(request, 'logout.html')
 
 async def medicos(request):
-    # Realiza una solicitud GET a la URL externa 'https://controlcitasmedicas.brayan986788.repl.co/api/pacientes'
     endpoint_url = 'https://controlcitasmedicas.brayan986788.repl.co/api/medicos'
 
     try:
@@ -169,32 +144,22 @@ async def medicos(request):
                     try:
                         response_json = await response.json()
 
-                        # Procesa los datos recibidos según sea necesario
-                        # Por ejemplo, podrías extraer datos específicos del JSON de respuesta
-
-                        # Obtener datos específicos del JSON de respuesta
                         medicos_data = response_json
-                        # Establecer esos datos en el contexto
 
-                        # Luego renderiza la plantilla pacientes.html con los datos
                         return render(request, 'medicos.html', {'medicos_data': medicos_data})
 
 
                     except Exception as e:
-                        # Maneja errores al cargar JSON
                         print(f"Error al cargar JSON: {e}")
                         return HttpResponseServerError()
                 else:
-                    # Otro error inesperado en la solicitud
                     return HttpResponseServerError()
 
     except Exception as e:
-        # Maneja errores de solicitud
         print(f"Error en la solicitud: {e}")
         return HttpResponseServerError()
 
 async def agendamedica(request, run):
-    # Realiza una solicitud GET a la URL externa 'https://controlcitasmedicas.brayan986788.repl.co/api/pacientes'
     endpoint_url = f'https://controlcitasmedicas.brayan986788.repl.co/api/agendamedica/run-medico/{run}'
 
 
@@ -205,20 +170,12 @@ async def agendamedica(request, run):
                     try:
                         response_json = await response.json()
 
-                        # Procesa los datos recibidos según sea necesario
-                        # Por ejemplo, podrías extraer datos específicos del JSON de respuesta
 
-                        # Obtener datos específicos del JSON de respuesta
                         agendamedica_data = response_json
-                        # Establecer esos datos en el contexto
                         if len(response_json) > 0:
-                            # Procesa los datos recibidos según sea necesario
-                            # Por ejemplo, podrías extraer datos específicos del JSON de respuesta
-
-                            # Obtener datos específicos del JSON de respuesta
+                            
                             agendamedica_data = response_json
 
-                            # Luego renderiza la plantilla agendamedica.html con los datos
                             return render(request, 'agendamedica.html', {'agendamedica_data': agendamedica_data, 'run': agendamedica_data[0]['run_medico']})
                         else:
                             print('no hay datos')
@@ -231,15 +188,12 @@ async def agendamedica(request, run):
                         print(f"Error al cargar JSON: {e}")
                         return HttpResponseServerError()
                 else:
-                    # Otro error inesperado en la solicitud
                     return []
 
     except Exception as e:
-        # Maneja errores de solicitud
         print(f"Error en la solicitud: {e}")
         return HttpResponseServerError()
 
-# En tu archivo views.py
 
 async def agregardia(request, run):
     if run:
@@ -266,7 +220,7 @@ async def agregardia(request, run):
                         else:
                             return JsonResponse({'error': f'Error {response.status} en la solicitud a {endpoint_url}'}, status=500)
             except Exception as e:
-                # Maneja errores de solicitud
+
                 print(f"Error en la solicitud: {e}")
                 return HttpResponseServerError()
     else:
@@ -339,33 +293,23 @@ async def registermedico(request):
                         try:
                             response_json = await response.json()
                             
-                            # Realiza acciones adicionales con response_json si es necesario
                             
-                            # Guarda el contenido en el localStorage
-                            # Esta parte se debe realizar en JavaScript en el cliente
-                            # Aquí solo puedes indicar qué hacer en la respuesta exitosa
                             return JsonResponse(response_json, status=201)
                         except Exception as e:
-                            # Maneja errores al cargar JSON
                             print(f"Error al cargar JSON: {e}")
                             return HttpResponseServerError()
                     elif response.status == 500:
-                        # Usuario no registrado en el sistema externo
                         return JsonResponse({'message': 'Usuario no registrado, verifique email o rut no esten asociados a una cuenta'}, status=404)
                     else:
-                        # Otro error inesperado en la solicitud
                         return JsonResponse({'error': f'Error {response.status} en la solicitud a {endpoint_url}'}, status=500)
                     
         except Exception as e:
-            # Maneja errores de solicitud
             print(f"Error en la solicitud: {e}")
             return HttpResponseServerError()
 
-    # Si la solicitud es GET, muestra la plantilla 'login.html'
     return render(request, 'registermedico.html')
 
 async def citas_medicas(request):
-        # Realiza una solicitud GET a la URL externa 'https://controlcitasmedicas.brayan986788.repl.co/api/pacientes'
     endpoint_url = 'https://controlcitasmedicas.brayan986788.repl.co/api/citasmedicas/'
 
     try:
@@ -376,27 +320,18 @@ async def citas_medicas(request):
                     try:
                         response_json = await response.json()
 
-                        # Procesa los datos recibidos según sea necesario
-                        # Por ejemplo, podrías extraer datos específicos del JSON de respuesta
-
-                        # Obtener datos específicos del JSON de respuesta
                         citas_data = response_json
-                        # Establecer esos datos en el contexto
 
-                        # Luego renderiza la plantilla pacientes.html con los datos
                         return render(request, 'citas.html', {'citas_data': citas_data})
 
 
                     except Exception as e:
-                        # Maneja errores al cargar JSON
                         print(f"Error al cargar JSON: {e}")
                         return HttpResponseServerError()
                 else:
-                    # Otro error inesperado en la solicitud
                     return HttpResponseServerError()
 
     except Exception as e:
-        # Maneja errores de solicitud
         print(f"Error en la solicitud: {e}")
         return HttpResponseServerError()
 
@@ -427,13 +362,45 @@ async def anular_cita(request, ID_agenda):
         print(f"Error en la solicitud: {e}")
         return HttpResponseServerError()
     
+def enviar_correo(request):
+    if request.method == 'POST':
 
+        destinatario = request.POST['destinatario']
+        asunto = request.POST['asunto']
+        contenido = request.POST['contenido']
+
+        api_key = 'TU_CLAVE_DE_API'
+
+        # Crea un objeto Mail
+        message = Mail(
+            from_email='tucorreo@gmail.com',
+            to_emails=destinatario,
+            subject=asunto,
+            plain_text_content=contenido)
+
+        try:
+            sg = SendGridAPIClient(api_key)
+            response = sg.send(message)
+
+            if response.status_code == 202:
+                return render(request, 'correo_enviado.html')
+            else:
+                return render(request, 'error_envio_correo.html')
+
+        except Exception as e:
+            return render(request, 'error_envio_correo.html')
+
+    return render(request, 'formulario_correo.html')
+
+
+async def formulario_cita(request):
+    return  render(request,'formulario_cita.html')
     
 
 async def agendarhora(request):
     sucursal = request.GET.get('sucursal')
     especialidad = request.GET.get('especialidad')
-    # Realiza una solicitud GET a la URL externa 'https://controlcitasmedicas.brayan986788.repl.co/api/pacientes'
+
     endpoint_url = f'https://controlcitasmedicas.brayan986788.repl.co/api/medicos/medicos_sucursal_especialidad/{sucursal}/{especialidad}'
     print(sucursal)
 
@@ -446,28 +413,22 @@ async def agendarhora(request):
                     try:
                         response_json = await response.json()
 
-                        # Procesa los datos recibidos según sea necesario
-                        # Por ejemplo, podrías extraer datos específicos del JSON de respuesta
-
-                        # Obtener datos específicos del JSON de respuesta
                         medicos_data = response_json
                         print(medicos_data)
-                        # Establecer esos datos en el contexto
 
-                        # Luego renderiza la plantilla pacientes.html con los datos
                         return render(request, 'agendahora.html', {'medicos_data': medicos_data})
 
 
                     except Exception as e:
-                        # Maneja errores al cargar JSON
+   
                         print(f"Error al cargar JSON: {e}")
                         return HttpResponseServerError()
                 else:
-                    # Otro error inesperado en la solicitud
+
                     return HttpResponseServerError()
 
     except Exception as e:
-        # Maneja errores de solicitud
+
         print(f"Error en la solicitud: {e}")
         return HttpResponseServerError()
     
@@ -477,7 +438,7 @@ async def seleccionar_hora(request):
     run = request.POST.get('run')
     print('rut' + run)
 
-    # Realiza una solicitud GET a la URL externa 'https://controlcitasmedicas.brayan986788.repl.co/api/pacientes'
+
     endpoint_url = f'https://controlcitasmedicas.brayan986788.repl.co/api/agendamedica/run-medico/{run}'
 
 
@@ -489,21 +450,12 @@ async def seleccionar_hora(request):
                     try:
                         print("hola2")
                         response_json = await response.json()
-
-                        # Procesa los datos recibidos según sea necesario
-                        # Por ejemplo, podrías extraer datos específicos del JSON de respuesta
-
-                        # Obtener datos específicos del JSON de respuesta
                         agendamedica_data = response_json
-                        # Establecer esos datos en el contexto
-                        if len(response_json) > 0:
-                            # Procesa los datos recibidos según sea necesario
-                            # Por ejemplo, podrías extraer datos específicos del JSON de respuesta
 
-                            # Obtener datos específicos del JSON de respuesta
+                        if len(response_json) > 0:
+
                             agendamedica_data = response_json
 
-                            # Luego renderiza la plantilla agendamedica.html con los datos
                             return render(request, 'seleccionar_hora.html', {'agendamedica_data': agendamedica_data, 'run': agendamedica_data[0]['run_medico']})
                         else:
                             print('no hay datos')
@@ -517,7 +469,7 @@ async def seleccionar_hora(request):
                         print(f"Error al cargar JSON: {e}")
                         return HttpResponseServerError()
                 else:
-                    # Otro error inesperado en la solicitud
+
                     print("hola")
                     return HttpResponseServerError()
 
@@ -540,7 +492,7 @@ async def confirmar_cita(request):
 
         
 
-        # Imprimir los datos para depuración
+  
         print(run_paciente),
         print(run_medico),
         print(fecha),
@@ -553,13 +505,9 @@ async def confirmar_cita(request):
             'hora_inicio': hora_inicio
         }
 
-        # Configurar encabezados de la solicitud
         headers = {'Content-Type': 'application/json'}
 
-        # Convertir los datos a formato JSON
         json_data = json.dumps(data)
-
-        # Definir la URL del endpoint para la solicitud
         endpoint_url = 'https://controlcitasmedicas.brayan986788.repl.co/api/citasmedicas/bloquear-agenda'
         endpoint_url2 = 'https://api.resend.com/emails'
 
@@ -584,14 +532,13 @@ async def confirmar_cita(request):
                     if response.status == 200:
                         async with session.post(endpoint_url2, data=json_email, headers=headers2) as response:
                             print(response)
-                        # La solicitud fue exitosa, puedes devolver una JsonResponse con un mensaje de éxito
+               
                         return render(request, 'home.html')
                     else:
-                        # La solicitud no fue exitosa, puedes devolver una JsonResponse con un mensaje de error
+
                         return JsonResponse({'error': 'Error en la solicitud'})
         except Exception as e:
-            # Manejar errores de conexión o excepciones, y devolver una JsonResponse con un mensaje de error
+   
             return JsonResponse({'error': str(e)})
 
-    # Si no es una solicitud POST, puedes devolver una JsonResponse con un mensaje de error
     return JsonResponse({'error': 'Solicitud incorrecta'})
