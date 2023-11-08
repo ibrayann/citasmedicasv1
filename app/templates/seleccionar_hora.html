@@ -1,79 +1,100 @@
 {% extends 'base.html' %} {% block content %}
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Seleccionar Fecha</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <div class="container-fluid px-5 bg-light my-5">
-    <div class="row">
+  <div class="row">
+    <div class="col-sm-12 col-md-10">
+      <section class="card p-5">
+        <h4 class="card-title mb-4 fw-bold text-success">Agenda Medica</h4>
 
-
-        <div class="col-sm-12 col-md-10">
-            <section class="card p-5">
-                <h4 class="card-title mb-4 fw-bold text-success">Agenda Medica</h4>
-                <button type="button" class="btn btn-success mb-4" data-bs-toggle="modal" data-bs-target="#exampleModal">Agregar Agenda</button>
-                {% if agendamedica_data %}
-                    <div class="row mb-5">
-                        <div class="col-md-4">
-                            <div class="input-group">
-                                <input type="date" id="fecha-filtro" class="form-control" title="fecha"/>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <button id="filtrar-agendas" class="btn btn-primary">Filtrar</button>
-                        </div>
-                    </div>
-                    <div class="table-responsive" style="height: max-content">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th scope="col">Disponible</th>
-                                    <th scope="col">Fecha</th>
-                                    <th scope="col">Hora Inicio</th>
-                                    <th scope="col">Hora Fin</th>
-                                    <th scope="col">Run Médico</th>
-                                    <th scope="col">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for agenda in agendamedica_data %}
-                                    <tr>
-                                        <td {% if not agenda.disponible %} class="text-danger" {% endif %}>
-                                            {% if agenda.disponible %} Disponible {% else %} Ocupada {% endif %}
-                                        </td>
-                                        <td {% if not agenda.disponible %} class="text-danger" {% endif %}>{{ agenda.fecha }}</td>
-                                        <td {% if not agenda.disponible %} class="text-danger" {% endif %}>{{ agenda.hora_inicio }}</td>
-                                        <td {% if not agenda.disponible %} class="text-danger" {% endif %}>{{ agenda.hora_fin }}</td>
-                                        <td {% if not agenda.disponible %} class="text-danger" {% endif %}>{{ agenda.run_medico }}</td>
-                                        <td {% if not agenda.disponible %} class="text-danger" {% endif %}>
-                                            <form style="width: 100%" id="cambioEstadoForm" method="POST" action="{% url 'cambioDisponibilidad' %}">
-                                                {% csrf_token %}
-                                                <input type="hidden" name="agenda_id" value="{{ agenda.ID_agenda }}" />
-                                                <input type="hidden" name="disponible" value="{% if agenda.disponible %}false{% else %}true{% endif %}" />
-                                                <input type="hidden" name="_method" value="patch" />
-                                                <button type="submit" class="btn btn-warning" id="cambiarEstadoBtn">Cambiar Disponibilidad</button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                {% else %}
-                    <p>No hay datos de agenda médica disponibles.</p>
-                {% endif %}
-            </section>
+        {% if agendamedica_data %}
+        <div class="row mb-5">
+          <div class="col-md-4">
+            <div class="input-group">
+              <input
+                type="date"
+                id="fecha-filtro"
+                class="form-control"
+                title="fecha"
+              />
+            </div>
+          </div>
+          <div class="col-md-4">
+            <button id="filtrar-agendas" class="btn btn-primary">
+              Filtrar
+            </button>
+          </div>
         </div>
+        <div class="table-responsive" style="height: max-content">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Fecha</th>
+                <th scope="col">Hora Inicio</th>
+                <th scope="col">Hora Fin</th>
+                <th scope="col">Run Médico</th>
+                <th scope="col">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for agenda in agendamedica_data %} {% if agenda.disponible %}
+              <tr>
+                <td>{{ agenda.fecha }}</td>
+                <td>{{ agenda.hora_inicio }}</td>
+                <td>{{ agenda.hora_fin }}</td>
+                <td>{{ agenda.run_medico }}</td>
+                <td>
+                  <form
+                    style="width: 100%"
+                    id="confirmarcita"
+                    method="POST"
+                    action="{% url 'confirmar_cita' %}"
+                  >
+                    {% csrf_token %}
+                    <input
+                      type="hidden"
+                      name="hora_inicio_cita"
+                      value="{{ agenda.hora_inicio }}"
+                    />
+                    <input
+                      type="hidden"
+                      name="fecha_cita"
+                      value="{{ agenda.fecha }}"
+                    />
+                    <input
+                      type="hidden"
+                      name="run_medico_cita"
+                      value="{{ agenda.run_medico }}"
+                    />
+                    <!-- Agrega el campo oculto para el Rut del paciente -->
+                    <input
+                      type="text"
+                      name="rut_paciente_cita"
+                      class="rut_paciente_cita"
+                      value=""
+                    />
+                    <p>
+                      <button
+                        type="submit"
+                        class="btn btn-warning"
+                        id="Agendar"
+                      >
+                        Agendar
+                      </button>
+                    </p>
+                  </form>
+                </td>
+              </tr>
+              {% endif %} {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p>No hay datos de agenda médica disponibles.</p>
+        {% endif %}
+      </section>
     </div>
+  </div>
 </div>
-
-
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
@@ -95,30 +116,19 @@
     });
   });
 </script>
-<!-- <script>
-   document.addEventListener('DOMContentLoaded', function () {
-    // Captura el valor de 'run' de la URL actual
-    const url = window.location.href;
-    const match = url.match(/\/agendamedica\/([^/]+)/);
-    const runValue = match ? match[1] : null; // Verifica si se capturó 'run' de la URL
+<script>
+  var rutPaciente = localStorage.getItem("userData")
+    ? JSON.parse(localStorage.getItem("userData")).run
+    : "";
 
-    // Establece el valor capturado en el campo oculto del formulario
-    const runInput = document.getElementById('runInput');
-    if (runInput && runValue) {
-        runInput.value = runValue;
-    }
-});
+  // Busca todos los elementos con la clase "rut_paciente_cita"
+  var elementos = document.querySelectorAll(".rut_paciente_cita");
 
-// Muestra el modal y envía el formulario
-$('#exampleModal').on('shown.bs.modal', function () {
-    const form = document.getElementById('agregardiaForm');
-    if (form) {
-        form.submit();
-    }
-});
-
+  // Asigna el valor del Rut del paciente a todos los elementos encontrados
+  elementos.forEach(function (elemento) {
+    elemento.value = rutPaciente;
+  });
 </script>
-
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const feriadosData = [
@@ -271,6 +281,5 @@ $('#exampleModal').on('shown.bs.modal', function () {
       }
     });
   });
-</script> -->
-
+</script>
 {% endblock %}

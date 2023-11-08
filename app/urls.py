@@ -18,5 +18,6 @@ urlpatterns = [
   path('agendarhora/', views.agendarhora, name='agendarhora'),
   path('formulario_cita/', views.formulario_cita, name='formulario_cita'),
   path('seleccionar_hora/', views.seleccionar_hora, name='seleccionar_hora'),
+  path('confirmar_cita/', views.confirmar_cita, name='confirmar_cita'),
 
 ]

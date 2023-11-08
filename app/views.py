@@ -474,10 +474,13 @@ async def agendarhora(request):
     
 
 async def seleccionar_hora(request):
-    run = request.GET.get('run')
+
+    run = request.POST.get('run')
+    print('rut' + run)
+
     # Realiza una solicitud GET a la URL externa 'https://controlcitasmedicas.brayan986788.repl.co/api/pacientes'
     endpoint_url = f'https://controlcitasmedicas.brayan986788.repl.co/api/agendamedica/run-medico/{run}'
-    print(run)
+
 
 
     try:
@@ -506,6 +509,7 @@ async def seleccionar_hora(request):
                         else:
                             print('no hay datos')
                             print(run)
+                            print("hola3")
                             return render(request, 'seleccionar_hora.html', { 'run': str(run)})
                         
                 
@@ -524,3 +528,53 @@ async def seleccionar_hora(request):
         return HttpResponseServerError()
 
     
+
+
+async def confirmar_cita(request):
+    if request.method == 'POST':
+        print(request)
+        run_paciente = request.POST.get('rut_paciente_cita')
+        run_medico = request.POST.get('run_medico_cita')
+        fecha = request.POST.get('fecha_cita')
+        hora_inicio = request.POST.get('hora_inicio_cita')
+
+
+        
+
+        # Imprimir los datos para depuración
+        print(run_paciente),
+        print(run_medico),
+        print(fecha),
+        print(hora_inicio)
+
+        data = {
+            'run_paciente': run_paciente,
+            'run_medico': run_medico,
+            'fecha': fecha,
+            'hora_inicio': hora_inicio
+        }
+
+        # Configurar encabezados de la solicitud
+        headers = {'Content-Type': 'application/json'}
+
+        # Convertir los datos a formato JSON
+        json_data = json.dumps(data)
+
+        # Definir la URL del endpoint para la solicitud
+        endpoint_url = 'https://controlcitasmedicas.brayan986788.repl.co/api/citasmedicas/bloquear-agenda'
+
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.post(endpoint_url, data=json_data, headers=headers) as response:
+                    if response.status == 200:
+                        # La solicitud fue exitosa, puedes devolver una JsonResponse con un mensaje de éxito
+                        return JsonResponse({'message': 'Cita confirmada exitosamente'})
+                    else:
+                        # La solicitud no fue exitosa, puedes devolver una JsonResponse con un mensaje de error
+                        return JsonResponse({'error': 'Error en la solicitud'})
+        except Exception as e:
+            # Manejar errores de conexión o excepciones, y devolver una JsonResponse con un mensaje de error
+            return JsonResponse({'error': str(e)})
+
+    # Si no es una solicitud POST, puedes devolver una JsonResponse con un mensaje de error
+    return JsonResponse({'error': 'Solicitud incorrecta'})

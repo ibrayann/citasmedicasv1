@@ -13,32 +13,32 @@
             <h1 class="fw-bold text-center my-5">Agendar hora</h1>
             <h2 class="fw-bold text-center my-5">2. Elegir medico</h2>
             <div class="d-flex justify-content-center flex-column">
-
-            <form
-                method="GET"
+              <form
+                method="POST"
                 action="{% url 'seleccionar_hora' %}"
-                id="agendarForm"
+                id="agendarFormm"
                 class="px-5"
               >
                 {% csrf_token %}
-                  
+
                 <div class="form-group">
                   <label for="run">Selecciona un medico:</label>
-                  <select
-                    class="form-control mb-3"
-                    id="run"
-                    name="run"
-                  >
-                  {% for medico in medicos_data %}
-                    <option value="{{ medico.run }}">{{ medico.nombre }} {{ medico.apellido }} {{ medico.run }}</option>
-                  {% endfor %}  
+                  <select class="form-control mb-3" id="run" name="run">
+                    {% for medico in medicos_data %}
+                    <option value="{{ medico.run }}">
+                      {{ medico.nombre }} {{ medico.apellido }} {{ medico.run }}
+                    </option>
+                    {% endfor %}
                   </select>
                 </div>
-                 
-                <button type="submit" id="agendarButton" class="btn btn-dark mb-5">
+
+                <button
+                  type="submit"
+                  id="agendarButton"
+                  class="btn btn-dark mb-5"
+                >
                   Siguiente
                 </button>
-
               </form>
 
               <div id="alertUsuarioSuccess" class="d-none alert alert-success">
@@ -56,29 +56,29 @@
                 agendarForm.addEventListener("submit", async (e) => {
                   e.preventDefault();
 
-                    const data = new FormData(agendarForm);
-                    console.log("aca estoy");
-                    try {
-                    const response = await fetch(`/seleccionar_hora/?${new URLSearchParams(data)}/`, {
+                  const data = new FormData(agendarForm);
+                  console.log("aca estoy");
+                  try {
+                    const response = await fetch(
+                      `/seleccionar_hora/?${new URLSearchParams(data)}/`,
+                      {
                         method: "GET",
-                    });
+                      }
+                    );
 
                     if (response.status === 200) {
-                        console.log("hola2");
-                        const urlParams = new URLSearchParams(data);
-                        const urlString = `/seleccionar_hora/?${urlParams.toString()}`;
-                        window.location.href = urlString;
+                      console.log("hola2");
+                      const urlParams = new URLSearchParams(data);
+                      const urlString = `/seleccionar_hora/?${urlParams.toString()}`;
+                      window.location.href = urlString;
                     } else {
-                        null;
+                      null;
                     }
-                    } catch (error) {
-                        console.log("hola4");
-                    }
+                  } catch (error) {
+                    console.log("hola4");
+                  }
                 });
-
-
-              </script> 
-
+              </script>
             </div>
           </div>
         </div>
