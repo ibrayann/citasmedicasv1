@@ -25,15 +25,33 @@
 </div>
 
 <div class="container-fluid px-5 bg-light my-5">
-    <div class="row">
-        <div class="col-sm-12 col-md-2">
-            <div class="card mb-2">
-                <ul class="list-group list-group-flush">
-                    <a class="list-group-item" href="{% url 'pacientes' %}">Pacientes</a>
-                    <a class="list-group-item" href="{% url 'medicos' %}">Medicos</a>
-                    <a class="list-group-item" href="{% url 'pacientes' %}">Registar Medico</a>
-                    <a class="list-group-item">Ver Citas</a>
-                </ul>
+  <div class="row">
+    <div class="col-sm-12 col-md-2">
+      <div class="card mb-2">
+        <ul class="list-group list-group-flush">
+          <a class="list-group-item" href = "{% url 'pacientes'  %}">Pacientes</a>
+          <a class="list-group-item" href = "{% url 'medicos'  %}">Medicos</a>
+          <a class="list-group-item" href = "{% url 'pacientes'  %}">Registar Medico</a>
+          <a class="list-group-item" href="{% url 'citas_medicas'  %}">Ver Citas</a>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col-sm-12 col-md-10">
+      <section class="card p-5">
+        <h4 class="card-title mb-4 fw-bold text-success">Agenda Medica</h4>
+        <button
+          type="button"
+          class="btn btn-success mb-4"
+          data-bs-toggle="modal"
+          data-bs-target="#exampleModal"
+        >
+          Agregar Agenda
+        </button>
+        <div class="row mb-5">
+          <div class="col-md-4">
+            <div class="input-group">
+              <input type="date" id="fecha-filtro" class="form-control" />
             </div>
         </div>
 
