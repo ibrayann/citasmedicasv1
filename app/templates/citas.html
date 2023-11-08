@@ -15,11 +15,10 @@
                 <th scope="col">Run Paciente</th>
                 <th scope="col">Run Médico</th>
                 <th scope="col">Hora Inicio</th>
-
+                <th scope="col">Acciones</th>
               </tr>
             </thead>
             <tbody>
-
               {% for cita in citas_data %}
               <tr>
                 <td>{{ cita.fecha }}</td>
@@ -27,7 +26,11 @@
                 <td>{{ cita.Run_medico }}</td>
                 <td>{{ cita.hora_inicio }}</td>
                 <td>
-                  <a href="{% url 'anular_cita' cita.ID_agenda %}" class="btn btn-danger">Anular hora</a>
+                  <a
+                    href="{% url 'anular_cita' cita.ID_agenda %}"
+                    class="btn btn-danger"
+                    >Anular hora</a
+                  >
                 </td>
               </tr>
               {% endfor %}

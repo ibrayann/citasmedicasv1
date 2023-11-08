@@ -1,4 +1,4 @@
-from django.http import JsonResponse, HttpResponseServerError, HttpResponseNotFound
+from django.http import JsonResponse, HttpResponseServerError, HttpResponseNotFound, HttpResponseRedirect 
 from django.shortcuts import render
 import aiohttp
 import json
@@ -6,6 +6,10 @@ from django.views.decorators.csrf import csrf_exempt
 import requests
 from django.views.decorators.http import require_http_methods
 import asyncio
+from django.urls import reverse
+from django.shortcuts import render
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
 async def login(request):
     if request.method == 'POST':
@@ -253,7 +257,7 @@ async def agregardia(request, run):
                         if response.status == 200:
                             try:
                                 response_json = await response.json()
-                                return JsonResponse(response_json, status=200)
+                                return HttpResponseRedirect(reverse('agendamedica', args=(run,)))
                             except Exception as e:
                                 print(f"Error al cargar JSON: {e}")
                                 return HttpResponseServerError()
@@ -283,7 +287,7 @@ async def cambioDisponibilidad(request):
                 if response.status == 200:
                     try:
                         response_json = await response.json()
-                        return JsonResponse(response_json, status=200)
+                        return HttpResponseRedirect(reverse('medicos'))
                     except Exception as e:
                         print(f"Error al cargar JSON: {e}")
                         return HttpResponseServerError()
@@ -295,7 +299,6 @@ async def cambioDisponibilidad(request):
         # Maneja errores de solicitud
         print(f"Error en la solicitud: {e}")
         return HttpResponseServerError()
-    
 
 
 async def registermedico(request):
@@ -562,13 +565,31 @@ async def confirmar_cita(request):
 
         # Definir la URL del endpoint para la solicitud
         endpoint_url = 'https://controlcitasmedicas.brayan986788.repl.co/api/citasmedicas/bloquear-agenda'
+        endpoint_url2 = 'https://api.resend.com/emails'
+
+        dataaa = {
+    "cc": [],
+    "to": ["brayan986788@gmail.com"],
+    "bcc": [],
+    "from": "onboarding@resend.dev",
+    "html": f"<p> <strong>Tu cita para el dia {fecha} a las {hora_inicio} fue agendada con exito</strong>!</p>",
+    "tags": [],
+    "subject": "Hello World"
+}
+        json_email = json.dumps(dataaa)
+        headers2 = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer re_NdEsLBhj_Fwtzu51jpSRsWdQQZWR4RF7x'
+}
 
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.post(endpoint_url, data=json_data, headers=headers) as response:
                     if response.status == 200:
+                        async with session.post(endpoint_url2, data=json_email, headers=headers2) as response:
+                            print(response)
                         # La solicitud fue exitosa, puedes devolver una JsonResponse con un mensaje de éxito
-                        return JsonResponse({'message': 'Cita confirmada exitosamente'})
+                        return render(request, 'home.html')
                     else:
                         # La solicitud no fue exitosa, puedes devolver una JsonResponse con un mensaje de error
                         return JsonResponse({'error': 'Error en la solicitud'})
