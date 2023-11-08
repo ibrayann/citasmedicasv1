@@ -1,4 +1,4 @@
-from django.http import JsonResponse, HttpResponseServerError, HttpResponseNotFound
+from django.http import JsonResponse, HttpResponseServerError, HttpResponseNotFound, HttpResponseRedirect 
 from django.shortcuts import render
 import aiohttp
 import json
@@ -6,6 +6,10 @@ from django.views.decorators.csrf import csrf_exempt
 import requests
 from django.views.decorators.http import require_http_methods
 import asyncio
+from django.urls import reverse
+from django.shortcuts import render
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
 async def login(request):
     if request.method == 'POST':
@@ -253,7 +257,7 @@ async def agregardia(request, run):
                         if response.status == 200:
                             try:
                                 response_json = await response.json()
-                                return JsonResponse(response_json, status=200)
+                                return HttpResponseRedirect(reverse('agendamedica', args=(run,)))
                             except Exception as e:
                                 print(f"Error al cargar JSON: {e}")
                                 return HttpResponseServerError()
@@ -283,7 +287,7 @@ async def cambioDisponibilidad(request):
                 if response.status == 200:
                     try:
                         response_json = await response.json()
-                        return JsonResponse(response_json, status=200)
+                        return HttpResponseRedirect(reverse('medicos'))
                     except Exception as e:
                         print(f"Error al cargar JSON: {e}")
                         return HttpResponseServerError()
@@ -424,8 +428,39 @@ async def anular_cita(request, ID_agenda):
         print(f"Error en la solicitud: {e}")
         return HttpResponseServerError()
     
-    
+def enviar_correo(request):
+    if request.method == 'POST':
+        # Recopila los datos del formulario
+        destinatario = request.POST['destinatario']
+        asunto = request.POST['asunto']
+        contenido = request.POST['contenido']
+
+        # Configura tu clave de API de SendGrid
+        api_key = 'TU_CLAVE_DE_API'
+
+        # Crea un objeto Mail
+        message = Mail(
+            from_email='tucorreo@gmail.com',
+            to_emails=destinatario,
+            subject=asunto,
+            plain_text_content=contenido)
+
+        try:
+            sg = SendGridAPIClient(api_key)
+            response = sg.send(message)
+
+            if response.status_code == 202:
+                return render(request, 'correo_enviado.html')
+            else:
+                return render(request, 'error_envio_correo.html')
+
+        except Exception as e:
+            return render(request, 'error_envio_correo.html')
+
+    return render(request, 'formulario_correo.html')
 
 
 def agendarhora(request):
     return render(request, 'agendarhoras.html')
+
+
