@@ -7,58 +7,35 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="agregardiaForm" method="POST" action="{% url 'agregardia' run %}">
-              {% csrf_token %}
+                {% csrf_token %}
 
-              <div class="modal-body">
-                  <div class="form-group">
-                      <label for="fecha">Fecha:</label>
-                      <input type="date" class="form-control" id="fecha" name="fecha" min="{{ fecha_actual }}" max="{{ fecha_maxima }}" />
-                  </div>
-              </div>
-              <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                  <button type="submit" class="btn btn-primary">Guardar</button>
-              </div>
-          </form>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for "fecha">Fecha:</label>
+                        <input type="date" class="form-control" id="fecha" name="fecha" min="{{ fecha_actual }}" max="{{ fecha_maxima }}" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
 <div class="container-fluid px-5 bg-light my-5">
-  <div class="row">
-    <div class="col-sm-12 col-md-2">
-      <div class="card mb-2">
-        <ul class="list-group list-group-flush">
-          <a class="list-group-item" href = "{% url 'pacientes'  %}">Pacientes</a>
-          <a class="list-group-item" href = "{% url 'medicos'  %}">Medicos</a>
-          <a class="list-group-item" href = "{% url 'pacientes'  %}">Registar Medico</a>
-          <a class="list-group-item" href="{% url 'citas_medicas'  %}">Ver Citas</a>
-        </ul>
-      </div>
-    </div>
+    <div class="row">
 
-    <div class="col-sm-12 col-md-10">
-      <section class="card p-5">
-        <h4 class="card-title mb-4 fw-bold text-success">Agenda Medica</h4>
-        <button
-          type="button"
-          class="btn btn-success mb-4"
-          data-bs-toggle="modal"
-          data-bs-target="#exampleModal"
-        >
-          Agregar Agenda
-        </button>
-        <div class="row mb-5">
-          <div class="col-md-4">
-            <div class="input-group">
-              <input type="date" id="fecha-filtro" class="form-control" />
-            </div>
-        </div>
+
+                {% include 'base_menu.html' %}
+
+
 
         <div class="col-sm-12 col-md-10">
             <section class="card p-5">
                 <h4 class="card-title mb-4 fw-bold text-success">Agenda Medica</h4>
-                    <button type="button" class="btn btn-success mb-4" data-bs-toggle="modal" data-bs-target="#exampleModal">Agregar Agenda</button>
+                <button type="button" class="btn btn-success mb-4" data-bs-toggle="modal" data-bs-target="#exampleModal">Agregar Agenda</button>
                 {% if agendamedica_data %}
                     <div class="row mb-5">
                         <div class="col-md-4">
@@ -85,14 +62,14 @@
                             <tbody>
                                 {% for agenda in agendamedica_data %}
                                     <tr>
-                                        <td {% if agenda.disponible == False %} class="text-danger" {% endif %}>
-                                            {% if agenda.disponible == True %} Disponible {% else %} Ocupada {% endif %}
+                                        <td {% if not agenda.disponible %} class="text-danger" {% endif %}>
+                                            {% if agenda.disponible %} Disponible {% else %} Ocupada {% endif %}
                                         </td>
-                                        <td {% if agenda.disponible == False %} class="text-danger" {% endif %}>{{ agenda.fecha }}</td>
-                                        <td {% if agenda.disponible == False %} class="text-danger" {% endif %}>{{ agenda.hora_inicio }}</td>
-                                        <td {% if agenda.disponible == False %} class="text-danger" {% endif %}>{{ agenda.hora_fin }}</td>
-                                        <td {% if agenda.disponible == False %} class="text-danger" {% endif %}>{{ agenda.run_medico }}</td>
-                                        <td {% if agenda.disponible == False %} class="text-danger" {% endif %}>
+                                        <td {% if not agenda.disponible %} class="text-danger" {% endif %}>{{ agenda.fecha }}</td>
+                                        <td {% if not agenda.disponible %} class="text-danger" {% endif %}>{{ agenda.hora_inicio }}</td>
+                                        <td {% if not agenda.disponible %} class="text-danger" {% endif %}>{{ agenda.hora_fin }}</td>
+                                        <td {% if not agenda.disponible %} class="text-danger" {% endif %}>{{ agenda.run_medico }}</td>
+                                        <td {% if not agenda.disponible %} class="text-danger" {% endif %}>
                                             <form style="width: 100%" id="cambioEstadoForm" method="POST" action="{% url 'cambioDisponibilidad' %}">
                                                 {% csrf_token %}
                                                 <input type="hidden" name="agenda_id" value="{{ agenda.ID_agenda }}" />
@@ -113,6 +90,7 @@
         </div>
     </div>
 </div>
+
 
 
 <script>
