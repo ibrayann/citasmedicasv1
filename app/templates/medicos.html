@@ -17,6 +17,7 @@
                 <th scope="col">Apellido</th>
                 <th scope="col">Email</th>
                 <th scope="col">Run Secretaria</th>
+                <th scope="col">Ver Agenda</th>
               </tr>
             </thead>
             <tbody>
@@ -28,7 +29,11 @@
                 <td>{{ medico.email }}</td>
                 <td>{{ medico.run_secretaria }}</td>
                 <td>
-                  <a href="{% url 'agendamedica' medico.run %}">Ver Agenda</a>
+                  <a
+                    class="btn btn-success"
+                    href="{% url 'agendamedica' medico.run %}"
+                    >Ver Agenda</a
+                  >
                 </td>
               </tr>
               {% endfor %}

@@ -299,7 +299,6 @@ async def cambioDisponibilidad(request):
         # Maneja errores de solicitud
         print(f"Error en la solicitud: {e}")
         return HttpResponseServerError()
-    
 
 
 async def registermedico(request):
@@ -428,39 +427,171 @@ async def anular_cita(request, ID_agenda):
         print(f"Error en la solicitud: {e}")
         return HttpResponseServerError()
     
-def enviar_correo(request):
+
+    
+
+async def agendarhora(request):
+    sucursal = request.GET.get('sucursal')
+    especialidad = request.GET.get('especialidad')
+    # Realiza una solicitud GET a la URL externa 'https://controlcitasmedicas.brayan986788.repl.co/api/pacientes'
+    endpoint_url = f'https://controlcitasmedicas.brayan986788.repl.co/api/medicos/medicos_sucursal_especialidad/{sucursal}/{especialidad}'
+    print(sucursal)
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(endpoint_url) as response:
+                print(response.status)
+                
+                if response.status == 200:
+                    try:
+                        response_json = await response.json()
+
+                        # Procesa los datos recibidos según sea necesario
+                        # Por ejemplo, podrías extraer datos específicos del JSON de respuesta
+
+                        # Obtener datos específicos del JSON de respuesta
+                        medicos_data = response_json
+                        print(medicos_data)
+                        # Establecer esos datos en el contexto
+
+                        # Luego renderiza la plantilla pacientes.html con los datos
+                        return render(request, 'agendahora.html', {'medicos_data': medicos_data})
+
+
+                    except Exception as e:
+                        # Maneja errores al cargar JSON
+                        print(f"Error al cargar JSON: {e}")
+                        return HttpResponseServerError()
+                else:
+                    # Otro error inesperado en la solicitud
+                    return HttpResponseServerError()
+
+    except Exception as e:
+        # Maneja errores de solicitud
+        print(f"Error en la solicitud: {e}")
+        return HttpResponseServerError()
+    
+
+async def seleccionar_hora(request):
+
+    run = request.POST.get('run')
+    print('rut' + run)
+
+    # Realiza una solicitud GET a la URL externa 'https://controlcitasmedicas.brayan986788.repl.co/api/pacientes'
+    endpoint_url = f'https://controlcitasmedicas.brayan986788.repl.co/api/agendamedica/run-medico/{run}'
+
+
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(endpoint_url) as response:
+                if response.status == 200:
+                    try:
+                        print("hola2")
+                        response_json = await response.json()
+
+                        # Procesa los datos recibidos según sea necesario
+                        # Por ejemplo, podrías extraer datos específicos del JSON de respuesta
+
+                        # Obtener datos específicos del JSON de respuesta
+                        agendamedica_data = response_json
+                        # Establecer esos datos en el contexto
+                        if len(response_json) > 0:
+                            # Procesa los datos recibidos según sea necesario
+                            # Por ejemplo, podrías extraer datos específicos del JSON de respuesta
+
+                            # Obtener datos específicos del JSON de respuesta
+                            agendamedica_data = response_json
+
+                            # Luego renderiza la plantilla agendamedica.html con los datos
+                            return render(request, 'seleccionar_hora.html', {'agendamedica_data': agendamedica_data, 'run': agendamedica_data[0]['run_medico']})
+                        else:
+                            print('no hay datos')
+                            print(run)
+                            print("hola3")
+                            return render(request, 'seleccionar_hora.html', { 'run': str(run)})
+                        
+                
+                    except Exception as e:
+                        # Maneja errores al cargar JSON
+                        print(f"Error al cargar JSON: {e}")
+                        return HttpResponseServerError()
+                else:
+                    # Otro error inesperado en la solicitud
+                    print("hola")
+                    return HttpResponseServerError()
+
+    except Exception as e:
+        # Maneja errores de solicitud
+        print(f"Error en la solicitud: {e}")
+        return HttpResponseServerError()
+
+    
+
+
+async def confirmar_cita(request):
     if request.method == 'POST':
-        # Recopila los datos del formulario
-        destinatario = request.POST['destinatario']
-        asunto = request.POST['asunto']
-        contenido = request.POST['contenido']
+        print(request)
+        run_paciente = request.POST.get('rut_paciente_cita')
+        run_medico = request.POST.get('run_medico_cita')
+        fecha = request.POST.get('fecha_cita')
+        hora_inicio = request.POST.get('hora_inicio_cita')
 
-        # Configura tu clave de API de SendGrid
-        api_key = 'TU_CLAVE_DE_API'
 
-        # Crea un objeto Mail
-        message = Mail(
-            from_email='tucorreo@gmail.com',
-            to_emails=destinatario,
-            subject=asunto,
-            plain_text_content=contenido)
+        
+
+        # Imprimir los datos para depuración
+        print(run_paciente),
+        print(run_medico),
+        print(fecha),
+        print(hora_inicio)
+
+        data = {
+            'run_paciente': run_paciente,
+            'run_medico': run_medico,
+            'fecha': fecha,
+            'hora_inicio': hora_inicio
+        }
+
+        # Configurar encabezados de la solicitud
+        headers = {'Content-Type': 'application/json'}
+
+        # Convertir los datos a formato JSON
+        json_data = json.dumps(data)
+
+        # Definir la URL del endpoint para la solicitud
+        endpoint_url = 'https://controlcitasmedicas.brayan986788.repl.co/api/citasmedicas/bloquear-agenda'
+        endpoint_url2 = 'https://api.resend.com/emails'
+
+        dataaa = {
+    "cc": [],
+    "to": ["brayan986788@gmail.com"],
+    "bcc": [],
+    "from": "onboarding@resend.dev",
+    "html": f"<p> <strong>Tu cita para el dia {fecha} a las {hora_inicio} fue agendada con exito</strong>!</p>",
+    "tags": [],
+    "subject": "Hello World"
+}
+        json_email = json.dumps(dataaa)
+        headers2 = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer re_NdEsLBhj_Fwtzu51jpSRsWdQQZWR4RF7x'
+}
 
         try:
-            sg = SendGridAPIClient(api_key)
-            response = sg.send(message)
-
-            if response.status_code == 202:
-                return render(request, 'correo_enviado.html')
-            else:
-                return render(request, 'error_envio_correo.html')
-
+            async with aiohttp.ClientSession() as session:
+                async with session.post(endpoint_url, data=json_data, headers=headers) as response:
+                    if response.status == 200:
+                        async with session.post(endpoint_url2, data=json_email, headers=headers2) as response:
+                            print(response)
+                        # La solicitud fue exitosa, puedes devolver una JsonResponse con un mensaje de éxito
+                        return render(request, 'home.html')
+                    else:
+                        # La solicitud no fue exitosa, puedes devolver una JsonResponse con un mensaje de error
+                        return JsonResponse({'error': 'Error en la solicitud'})
         except Exception as e:
-            return render(request, 'error_envio_correo.html')
+            # Manejar errores de conexión o excepciones, y devolver una JsonResponse con un mensaje de error
+            return JsonResponse({'error': str(e)})
 
-    return render(request, 'formulario_correo.html')
-
-
-def agendarhora(request):
-    return render(request, 'agendarhoras.html')
-
-
+    # Si no es una solicitud POST, puedes devolver una JsonResponse con un mensaje de error
+    return JsonResponse({'error': 'Solicitud incorrecta'})
