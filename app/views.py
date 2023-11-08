@@ -263,9 +263,6 @@ async def cambioDisponibilidad(request):
     json_data = {'disponible': disponible }
     headers = {'Content-Type': 'application/json'}
     endpoint_url = f'https://controlcitasmedicas.brayan986788.repl.co/api/agendamedica/desbloquear-hora/{id_agenda}'
-    print('data',json_data)
-    print('headers',headers)
-    print('endpoint_url',endpoint_url)
 
     try:
         async with aiohttp.ClientSession() as session:
@@ -388,8 +385,34 @@ async def citas_medicas(request):
         print(f"Error en la solicitud: {e}")
         return HttpResponseServerError()
 
-def anular_cita(request):
-    return render(request, 'citas.html')
+async def anular_cita(request, ID_agenda):
+    disponible = True
+    json_data = {'disponible': disponible }
+    headers = {'Content-Type': 'application/json'}
+    endpoint_url = f'https://controlcitasmedicas.brayan986788.repl.co/api/agendamedica/desbloquear-hora/{ID_agenda}'
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.patch(endpoint_url, json=json_data, headers=headers) as response:
+                print(response)
+                if response.status == 200:
+                    try:
+                        response_json = await response.json()
+                        return render(request, 'citas.html')
+                    except Exception as e:
+                        print(f"Error al cargar JSON: {e}")
+                        return HttpResponseServerError()
+                elif response.status == 404:
+                    return JsonResponse({'message': 'Usuario no registrado'}, status=404)
+                else:
+                    return JsonResponse({'error': f'Error {response.status} en la solicitud a {endpoint_url}'}, status=500)
+                
+    except Exception as e:
+        # Maneja errores de solicitud
+        print(f"Error en la solicitud: {e}")
+        return HttpResponseServerError()
+    
+    
 
 
 def agendarhora(request):
