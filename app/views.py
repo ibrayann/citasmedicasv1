@@ -336,14 +336,12 @@ async def citas_medicas(request):
         return HttpResponseServerError()
 
 async def anular_cita(request, ID_agenda):
-    disponible = True
-    json_data = {'disponible': disponible }
     headers = {'Content-Type': 'application/json'}
-    endpoint_url = f'https://controlcitasmedicas.brayan986788.repl.co/api/agendamedica/desbloquear-hora/{ID_agenda}'
+    endpoint_url = f'https://controlcitasmedicas.brayan986788.repl.co/api/agendamedica/eliminar-cita/{ID_agenda}'
 
     try:
         async with aiohttp.ClientSession() as session:
-            async with session.patch(endpoint_url, json=json_data, headers=headers) as response:
+            async with session.patch(endpoint_url, headers=headers) as response:
                 print(response)
                 if response.status == 200:
                     try:

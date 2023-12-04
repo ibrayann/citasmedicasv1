@@ -5,7 +5,56 @@
     <div class="col-sm-12 col-md-10">
       <section class="card p-5">
         <h4 class="card-title mb-4 fw-bold text-success">Citas Medicas</h4>
-        <!-- No necesitas el campo de búsqueda en este contexto -->
+
+        {% for cita in citas_data %}
+        <div
+          class="modal fade"
+          id="Modal{{ cita.ID_agenda }}"
+          tabindex="-1"
+          aria-labelledby="ModalLabel{{ cita.ID_agenda }}"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="ModalLabel{{ cita.ID_agenda }}">
+                  Confirmar anulación de cita medica
+                </h5>
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div class="modal-body">
+                <p>¿Estás seguro de anular de esta cita medica?</p>
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary"
+                  data-bs-dismiss="modal"
+                >
+                  Cancelar
+                </button>
+                <form
+                  method="POST"
+                  action="{% url 'anular_cita' cita.ID_agenda %}"
+                  class="d-inline"
+                >
+                  {% csrf_token %}
+
+                  <input type="hidden" name="_method" value="PATCH" />
+                  <button type="submit" class="btn btn-danger">
+                    Confirmar
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor%}
 
         <div class="table-responsive" style="height: max-content">
           <table class="table">
@@ -26,11 +75,28 @@
                 <td>{{ cita.Run_medico }}</td>
                 <td>{{ cita.hora_inicio }}</td>
                 <td>
-                  <a
-                    href="{% url 'anular_cita' cita.ID_agenda %}"
-                    class="btn btn-danger"
-                    >Anular hora</a
+                  <button
+                    type="button"
+                    class="btn btn-outline-dark"
+                    data-bs-toggle="modal"
+                    data-bs-target="#Modal{{ cita.ID_agenda }}"
                   >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="25"
+                      height="25"
+                      fill="dark"
+                      class="bi bi-eye"
+                      viewBox="0 0 16 16"
+                    >
+                      <path
+                        d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"
+                      />
+                      <path
+                        d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"
+                      />
+                    </svg>
+                  </button>
                 </td>
               </tr>
               {% endfor %}
